@@ -1,0 +1,117 @@
+---
+- name: Build Complete Home Lab Infrastructure with Cabling in NetBox
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    netbox_url: "http://10.0.0.52:8000"
+    netbox_token: "nbt_WwYJvdiKYpbn.6LsJU1PDzB2iWdJJwfOR9iO1TDZzJc1V8rJCswC1"
+
+  tasks:
+
+  # =========================================================
+  # SWITCH INTERFACES
+  # =========================================================
+
+  - name: Create Cisco Switch Interfaces
+    netbox.netbox.netbox_device_interface:
+      netbox_url: "{{ netbox_url }}"
+      netbox_token: "{{ netbox_token }}"
+      data:
+        device: "C9300-SW1"
+        name: "{{ item }}"
+        type: "1000base-t"
+      state: present
+
+    loop:
+      - "GigabitEthernet1/0/1"
+      - "GigabitEthernet1/0/2"
+      - "GigabitEthernet1/0/3"
+      - "GigabitEthernet1/0/4"
+
+  # =========================================================
+  # ESXI INTERFACES
+  # =========================================================
+
+  - name: Create ESXi Interfaces
+    netbox.netbox.netbox_device_interface:
+      netbox_url: "{{ netbox_url }}"
+      netbox_token: "{{ netbox_token }}"
+      data:
+        device: "ESXI-01"
+        name: "{{ item }}"
+        type: "1000base-t"
+      state: present
+
+    loop:
+      - "vmnic0"
+      - "vmnic1"
+
+  # =========================================================
+  # NETAPP INTERFACES
+  # =========================================================
+
+  - name: Create NetApp Interfaces
+    netbox.netbox.netbox_device_interface:
+      netbox_url: "{{ netbox_url }}"
+      netbox_token: "{{ netbox_token }}"
+      data:
+        device: "NETAPP-01"
+        name: "{{ item }}"
+        type: "10gbase-x-sfpp"
+      state: present
+
+    loop:
+      - "e0a"
+      - "e0b"
+
+  # =========================================================
+  # CABLE ESXI TO SWITCH
+  # =========================================================
+
+  - name: Connect ESXi to Cisco Switch
+    netbox.netbox.netbox_cable:
+      netbox_url: "{{ netbox_url }}"
+      netbox_token: "{{ netbox_token }}"
+      data:
+
+        termination_a_type: "dcim.interface"
+        termination_a:
+          device: "C9300-SW1"
+          name: "GigabitEthernet1/0/1"
+
+        termination_b_type: "dcim.interface"
+        termination_b:
+          device: "ESXI-01"
+          name: "vmnic0"
+
+        type: "cat6"
+        status: "connected"
+
+      state: present
+
+  # =========================================================
+  # CABLE NETAPP TO SWITCH
+  # =========================================================
+
+  - name: Connect NetApp to Cisco Switch
+    netbox.netbox.netbox_cable:
+      netbox_url: "{{ netbox_url }}"
+      netbox_token: "{{ netbox_token }}"
+      data:
+
+        termination_a_type: "dcim.interface"
+        termination_a:
+          device: "C9300-SW1"
+          name: "GigabitEthernet1/0/2"
+
+        termination_b_type: "dcim.interface"
+        termination_b:
+          device: "NETAPP-01"
+          name: "e0a"
+
+        type: "mmf"
+        status: "connected"
+
+      state: present

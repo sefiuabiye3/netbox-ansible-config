@@ -1,0 +1,12 @@
+---
+plugin: netbox.netbox.nb_inventory
+
+api_endpoint: http://10.0.0.52:8000
+token: 'nbt_WwYJvdiKYpbn.6LsJU1PDzB2iWdJJwfOR9iO1TDZzJc1V8rJCswC1'
+validate_certs: False
+config_context: False
+
+group_by:
+  - device_roles
+compose:
+  ansible_network_os: platform.slug

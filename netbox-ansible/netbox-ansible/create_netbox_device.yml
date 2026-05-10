@@ -1,0 +1,42 @@
+---
+- name: Setup NetBox objects
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  collections:
+    - netbox.netbox
+
+  tasks:
+
+    - name: Create manufacturer
+      netbox.netbox.netbox_manufacturer:
+        netbox_url: http://10.0.0.52:8000
+        netbox_token: nbt_WwYJvdiKYpbn.6LsJU1PDzB2iWdJJwfOR9iO1TDZzJc1V8rJCswC1
+        data:
+          name: Cisco
+          slug: cisco
+        state: present
+
+    - name: Create device type
+      netbox.netbox.netbox_device_type:
+        netbox_url: http://10.0.0.52:8000
+        netbox_token: nbt_WwYJvdiKYpbn.6LsJU1PDzB2iWdJJwfOR9iO1TDZzJc1V8rJCswC1
+        data:
+          model: ISR4321
+          slug: isr4321
+          manufacturer:
+            slug: cisco
+        state: present
+
+    - name: Create device
+      netbox.netbox.netbox_device:
+        netbox_url: http://10.0.0.52:8000
+        netbox_token: nbt_WwYJvdiKYpbn.6LsJU1PDzB2iWdJJwfOR9iO1TDZzJc1V8rJCswC1
+        data:
+          name: R3
+          device_type: isr4321
+          device_role: Router
+          site: Brooklyn_Park
+          status: active
+        state: present

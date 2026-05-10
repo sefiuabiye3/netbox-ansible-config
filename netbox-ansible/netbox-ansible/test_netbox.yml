@@ -1,0 +1,58 @@
+- name: "Test NetBox modules"
+  connection: local
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Create cable within NetBox with only required information
+      netbox.netbox.netbox_cable:
+        netbox_url: http://10.0.0.52:8000
+        netbox_token: nbt_WwYJvdiKYpbn.6LsJU1PDzB2iWdJJwfOR9iO1TDZzJc1V8rJCswC1
+        data:
+          termination_a_type: dcim.interface
+          termination_a:
+            device: R1
+            name: Ethernet2/2
+          termination_b_type: dcim.interface
+          termination_b:
+            device: R1
+            name: Ethernet2/1
+        state: present
+
+    - name: Update cable with other fields
+      netbox.netbox.netbox_cable:
+        netbox_url: http://10.0.0.52:8000
+        netbox_token: nbt_WwYJvdiKYpbn.6LsJU1PDzB2iWdJJwfOR9iO1TDZzJc1V8rJCswC1
+        data:
+          termination_a_type: dcim.interface
+          termination_a:
+            device: R2
+            name: Ethernet2/2
+          termination_b_type: dcim.interface
+          termination_b:
+            device: R2
+            name: Ethernet2/1
+          type: mmf-om4
+          status: planned
+          label: label123
+          color: abcdef
+          length: 30
+          length_unit: m
+          tags:
+            - foo
+        state: present
+
+    - name: Delete cable within netbox
+      netbox.netbox.netbox_cable:
+        netbox_url: http://10.0.0.52.8000
+        netbox_token: nbt_WwYJvdiKYpbn.6LsJU1PDzB2iWdJJwfOR9iO1TDZzJc1V8rJCswC1
+        data:
+          termination_a_type: dcim.interface
+          termination_a:
+            device: R2
+            name: Ethernet2/2
+          termination_b_type: dcim.interface
+          termination_b:
+            device: R2
+            name: Ethernet2/1
+        state: absent
