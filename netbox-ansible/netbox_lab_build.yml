@@ -1,0 +1,127 @@
+---
+- name: Build Home Lab Infrastructure in NetBox
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars:
+    netbox_url: "http://10.0.0.52:8000"
+    netbox_token: "nbt_WwYJvdiKYpbn.6LsJU1PDzB2iWdJJwfOR9iO1TDZzJc1V8rJCswC1"
+
+  tasks:
+
+  - name: Create Site
+    netbox.netbox.netbox_site:
+      netbox_url: "{{ netbox_url }}"
+      netbox_token: "{{ netbox_token }}"
+      data:
+        name: Home-Lab
+        slug: home-lab
+        description: Home lab infrastructure
+      state: present
+
+  - name: Create Location
+    netbox.netbox.netbox_location:
+      netbox_url: "{{ netbox_url }}"
+      netbox_token: "{{ netbox_token }}"
+      data:
+        name: Rack-01
+        slug: rack-01
+        site: Home-Lab
+      state: present
+
+  - name: Create Rack
+    netbox.netbox.netbox_rack:
+      netbox_url: "{{ netbox_url }}"
+      netbox_token: "{{ netbox_token }}"
+      data:
+        name: Rack-01
+        site: Home-Lab
+        location: Rack-01
+        u_height: 42
+      state: present
+
+  # --------------------
+  # Device Roles
+  # --------------------
+  - name: Create Device Roles
+    netbox.netbox.netbox_device_role:
+      netbox_url: "{{ netbox_url }}"
+      netbox_token: "{{ netbox_token }}"
+      data:
+        name: "{{ item.name }}"
+        slug: "{{ item.slug }}"
+      state: present
+    loop:
+      - { name: "Core Switch", slug: "core-switch" }
+      - { name: "Hypervisor", slug: "hypervisor" }
+      - { name: "Storage", slug: "storage" }
+      - { name: "Compute", slug: "compute" }
+
+  # --------------------
+  # Manufacturers
+  # --------------------
+  - name: Create Manufacturers
+    netbox.netbox.netbox_manufacturer:
+      netbox_url: "{{ netbox_url }}"
+      netbox_token: "{{ netbox_token }}"
+      data:
+        name: "{{ item }}"
+        slug: "{{ item | lower }}"
+      state: present
+    loop:
+      - Cisco
+      - NetApp
+      - Dell
+
+  # --------------------
+  # Device Types
+  # --------------------
+  - name: Create Device Types
+    netbox.netbox.netbox_device_type:
+      netbox_url: "{{ netbox_url }}"
+      netbox_token: "{{ netbox_token }}"
+      data:
+        model: "{{ item.model }}"
+        slug: "{{ item.slug }}"
+        manufacturer: "{{ item.manufacturer }}"
+        u_height: "{{ item.u_height }}"
+      state: present
+    loop:
+      - { model: "Catalyst 9300-48P", slug: "c9300-48p", manufacturer: "Cisco", u_height: 1 }
+      - { model: "ESXi Hypervisor", slug: "esxi-host", manufacturer: "Dell", u_height: 2 }
+      - { model: "NetApp AFF", slug: "netapp-aff", manufacturer: "NetApp", u_height: 4 }
+
+  # --------------------
+  # Devices
+  # --------------------
+  - name: Create Devices
+    netbox.netbox.netbox_device:
+      netbox_url: "{{ netbox_url }}"
+      netbox_token: "{{ netbox_token }}"
+      data:
+        name: "{{ item.name }}"
+        device_type: "{{ item.device_type }}"
+        device_role: "{{ item.device_role }}"
+        site: Home-Lab
+        rack: Rack-01
+        position: "{{ item.position }}"
+        face: front
+      state: present
+    loop:
+      - { name: "C9300-SW1", device_type: "c9300-48p", device_role: "core-switch", position: 41 }
+      - { name: "ESXI-01", device_type: "esxi-host", device_role: "hypervisor", position: 30 }
+      - { name: "NETAPP-01", device_type: "netapp-aff", device_role: "storage", position: 35 }
+
+  # --------------------
+  # Interfaces (basic example)
+  # --------------------
+  - name: Create Switch Interface
+    netbox.netbox.netbox_device_interface:
+      netbox_url: "{{ netbox_url }}"
+      netbox_token: "{{ netbox_token }}"
+      data:
+        device: C9300-SW1
+        name: GigabitEthernet1/0/1
+        type: 1000base-t
+      state: present

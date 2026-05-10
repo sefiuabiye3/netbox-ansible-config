@@ -1,0 +1,28 @@
+---
+- name: Test NetBox modules
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+    - name: Create cable within NetBox
+      netbox.netbox.netbox_cable:
+        netbox_url: http://10.0.0.52:8000
+        netbox_token: nbt_WwYJvdiKYpbn.6LsJU1PDzB2iWdJJwfOR9iO1TDZzJc1V8rJCswC1
+
+        data:
+          termination_a_type: dcim.interface
+          termination_a:
+            device: R1
+            name: Ethernet2/2
+
+          termination_b_type: dcim.interface
+          termination_b:
+            device: R1
+            name: Ethernet2/1
+
+          type: cat6
+          status: connected
+
+        state: present
