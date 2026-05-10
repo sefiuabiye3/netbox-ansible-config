@@ -13,20 +13,20 @@ Create isolated environment:
 	source /netbox-venv/bin/activate
 
 Ungrade pip, and install the python library for NetBox
-	python3 -m pip install --upgrade pip
-	pip3 install pynetbox
+	# python3 -m pip install --upgrade pip
+	# pip3 install pynetbox
 
 Install ansible, netaddr, ansible-pylibssh, and pytz.
-	pip install ansible
-	pip install netaddr
-	pip install ansible-pylibssh
-	pip install pytz
+	# pip install ansible
+	# pip install netaddr
+	# pip install ansible-pylibssh
+	# pip install pytz
 
 Install the Ansible Galaxy collection for NetBox.
-	ansible-galaxy collection install netbox.netbox
+	# ansible-galaxy collection install netbox.netbox
 
 Install ansible collection to manage Cisco IOS.
-	ansible-galaxy collection install cisco.ios
+	# ansible-galaxy collection install cisco.ios
 
 Ansible needs a token to use the NetBox API.
 	Select API Tokens from the user menu.
@@ -37,8 +37,8 @@ Ansible needs a token to use the NetBox API.
 Add NetBox to Ansible inventory
 	NetBox to your Ansible inventory. Create a file named netbox_inventory.yml
 
-Bearer nbt_0TzV3PyfbOfa.qaxwuUzUiDZTmpyHXHs3SzWNEtrFjoEetjxGOjIz
-Bearer nbt_WwYJvdiKYpbn.6LsJU1PDzB2iWdJJwfOR9iO1TDZzJc1V8rJCswC1
+	token: nbt_0TzV3PyfbOfa.qaxwuUzUiDZTmpyHXHs3SzWNEtrFjoEetjxGOjIz
+
 ---
 plugin: netbox.netbox.nb_inventory
 api_endpoint: http://127.0.0.1/
@@ -51,7 +51,7 @@ group_by:
 compose:
   ansible_network_os:platform.slug
 
-	Create ansible local config file named ansible.cfg
+Create ansible local config file named ansible.cfg
 
 [defaults]
 inventory = /home/sabioye/Project/netbox/netbox-ansible/netbox_inventory.yml
